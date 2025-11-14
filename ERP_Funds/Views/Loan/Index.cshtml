@@ -206,6 +206,7 @@
         </div>
 
     </div>
+    <input type="hidden" id="isCalculated" value="0" />
 
     <!-- FOOTER -->
     <footer class="container text-center">
@@ -225,7 +226,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/Scripts/Funds_Scripts/Loan.js"></script>
 
-    <script>
+    @*<script>
         function calculateLoan() {
             const loanAmount = parseFloat(document.getElementById('loanAmount').value) || 0;
             const loanDays = parseInt(document.getElementById('loanDays').value) || 0;
@@ -280,7 +281,7 @@
                 totalRepay
             });
         }
-    </script>
+    </script>*@
 
     <script>
         $(document).ready(function () {

@@ -23,6 +23,7 @@
 function validateLoanForm() {
     const amount = $("#loanAmount").val().trim();
     const customer = $("#customerName").val().trim();
+    const isCalculated = $("#isCalculated").val();   // NEW FLAG CHECK
 
     if (!customer) {
         toastr.warning("Please select a customer.");
@@ -34,6 +35,13 @@ function validateLoanForm() {
         $("#loanAmount").focus();
         return false;
     }
+
+    // 🔥 REQUIRED VALIDATION: USER MUST CALCULATE LOAN BEFORE SUBMITTING
+    if (isCalculated == "0") {
+        toastr.error("Please calculate the loan before submitting.");
+        return false;
+    }
+
     return true;
 }
 
@@ -60,7 +68,7 @@ function EditLoan(LoanId) {
                 $('#loanDays').val(response.LoanDurationDays);
                 $('#interestRate').val(response.LoanInterest);
 
-                // Display results box
+                // Display result box
                 $('#resultBox').show();
                 $('#displayLoanAmount').text(response.LoanAmount);
                 $('#deductedInterest').text(response.DeductAmount);
@@ -68,6 +76,8 @@ function EditLoan(LoanId) {
                 $('#displayLoanDays').text(response.LoanDurationWithMonths);
                 $('#dailyReturn').text(response.DailyReturn);
                 $('#totalRepay').text(response.TotalPayable);
+
+                $("#isCalculated").val("1"); // Mark as calculated when editing
 
                 $("#btnSubmit").html('<i class="fas fa-save me-2"></i>Update Loan');
             } else {
@@ -129,6 +139,8 @@ function clearForm() {
     $("#loanForm")[0].reset();
     $('#customerName').val("").trigger('change');
     $('#hdnloanid').val('');
+
+    $("#isCalculated").val("0");   // RESET CALC FLAG
 
     $('#resultBox').hide();
     $('#deductedInterest').text('');
@@ -230,7 +242,7 @@ function deleteLoan(loanId) {
         url: "/Loan/DeleteLoanById",
         type: "POST",
         data: { LoanId: loanId },
-        success: function (response) {
+        success: function () {
             toastr.success("Loan deleted successfully.");
             getList();
         },
@@ -238,4 +250,45 @@ function deleteLoan(loanId) {
             toastr.error("Failed to delete loan.");
         }
     });
+}
+
+
+// ============================= LOAN CALCULATION =============================
+function calculateLoan() {
+    const loanAmount = parseFloat(document.getElementById('loanAmount').value) || 0;
+    const loanDays = parseInt(document.getElementById('loanDays').value) || 0;
+    const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+
+    if (loanAmount <= 0) {
+        toastr.error("Please enter a valid Loan Amount");
+        return;
+    }
+    if (loanDays <= 0) {
+        toastr.error("Please enter valid Days");
+        return;
+    }
+    if (interestRate <= 0) {
+        toastr.error("Please enter a valid Interest Rate");
+        return;
+    }
+
+    const totalMonths = Math.ceil(loanDays / 30);
+    const totalInterestPercent = interestRate * totalMonths;
+    const deductedInterest = (loanAmount * totalInterestPercent) / 100;
+    const givenAmount = loanAmount - deductedInterest;
+
+    const dailyReturn = (loanAmount / loanDays).toFixed(2);
+    const totalRepay = (dailyReturn * loanDays).toFixed(2);
+
+    document.getElementById('resultBox').style.display = 'block';
+    document.getElementById('displayLoanAmount').textContent = loanAmount.toLocaleString();
+    document.getElementById('deductedInterest').textContent = Math.round(deductedInterest).toLocaleString();
+    document.getElementById('givenAmount').textContent = Math.round(givenAmount).toLocaleString();
+    document.getElementById('displayLoanDays').textContent = `${loanDays} days (${totalMonths} month${totalMonths > 1 ? 's' : ''})`;
+    document.getElementById('dailyReturn').textContent = dailyReturn.toLocaleString();
+    document.getElementById('totalRepay').textContent = totalRepay.toLocaleString();
+
+    $("#isCalculated").val("1");  // MARK AS CALCULATED
+
+    toastr.success("Loan calculation successful!");
 }
