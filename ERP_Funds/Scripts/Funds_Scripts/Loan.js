@@ -42,6 +42,7 @@ function validateLoanForm() {
 $(document).on('click', '.edit-icon', function () {
     const LoanId = $(this).data('id');
     EditLoan(LoanId);
+    $("#loanAmount").focus();
 });
 
 function EditLoan(LoanId) {
@@ -61,6 +62,7 @@ function EditLoan(LoanId) {
 
                 // Display results box
                 $('#resultBox').show();
+                $('#displayLoanAmount').text(response.LoanAmount);
                 $('#deductedInterest').text(response.DeductAmount);
                 $('#givenAmount').text(response.AmountGivenToCustomer);
                 $('#displayLoanDays').text(response.LoanDurationWithMonths);
