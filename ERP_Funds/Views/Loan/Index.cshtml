@@ -1,0 +1,298 @@
+﻿
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Loan Mangement</title>
+    <link href="~/Content/Admin/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="~/Content/Admin/css/admin.css" rel="stylesheet" />
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/Content/Admin/img/computer.png" />
+
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <input type="hidden" id="hdnloanid" />
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cogs me-2"></i>AdminPanel
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Menu -->
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/Customer/Index">
+                            <i class="fas fa-users me-1"></i>Customer
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="~/Loan/Index">
+                            <i class="fas fa-hand-holding-usd me-1"></i>Loan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/DailyEntry/Index">
+                            <i class="fas fa-calendar-day me-1"></i>Daily Entry
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/ExcelReport/Index">
+                            <i class="fas fa-chart-bar me-1"></i>Reports
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link logout-btn" href="~/Login/Index">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="container">
+        <div class="page-header mt-4">
+            <h2><i class="fas fa-hand-holding-usd me-2"></i>Loan Management</h2>
+            <p class="text-muted">Assign new loan to customer and calculate payment details.</p>
+        </div>
+
+        <!-- LOAN FORM -->
+        <div class="card mt-4 mb-5">
+            <div class="card-header">
+                <i class="fas fa-file-invoice-dollar me-2"></i>New Loan Entry
+            </div>
+            <div class="card-body">
+                <form id="loanForm">
+                    <div class="row g-4">
+                        <!-- Customer Name -->
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="customerName" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-user text-warning me-1"></i> Customer Name
+                                </label>
+                                <div class="input-group">
+                                    <select id="customerName" name="customerName"
+                                            class="form-select shadow-sm border px-3 select2-dropdown" required>
+                                        <option value="">-- Select Customer --</option>
+                                        @if (ViewBag.CustomerList != null)
+                                        {
+                                            foreach (var cust in ViewBag.CustomerList as SelectList)
+                                            {
+                                                <option value="@cust.Value">@cust.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-6">
+
+                        </div>
+
+                        <!-- Loan Amount -->
+                        <div class="col-md-4">
+                            <label for="loanAmount" class="form-label">
+                                <i class="fas fa-indian-rupee-sign"></i> Loan Amount
+                            </label>
+                            <input type="number" class="form-control" id="loanAmount" placeholder="e.g. 100000" required>
+                        </div>
+
+                        <!-- Loan Duration -->
+                        <div class="col-md-4">
+                            <label for="loanDays" class="form-label">
+                                <i class="fas fa-clock"></i> Loan Duration (Days)
+                            </label>
+                            <input type="number" class="form-control" id="loanDays" placeholder="e.g. 80" value="80" required>
+                        </div>
+
+                        <!-- Interest Rate -->
+                        <div class="col-md-4">
+                            <label for="interestRate" class="form-label">
+                                <i class="fas fa-percent"></i> Interest % (per 30 days)
+                            </label>
+                            <input type="number" class="form-control" id="interestRate" placeholder="e.g. 5" value="5" required>
+                        </div>
+
+                        <!-- Calculate Button -->
+                        <div class="col-md-12 text-center mt-3">
+                            <button type="button" class="btn btn-calc" onclick="calculateLoan()">
+                                <i class="fas fa-calculator me-2"></i>Calculate Loan
+                            </button>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="col-12 mt-4">
+                            <div id="resultBox" class="result-box" style="display:none;">
+                                <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i>Loan Summary</h5>
+                                <p><strong>Loan Amount:</strong> ₹<span id="displayLoanAmount"></span></p>
+                                <p><strong>Deducted Amount:</strong> ₹<span id="deductedInterest"></span></p>
+                                <p><strong>Amount Given to Customer:</strong> ₹<span id="givenAmount"></span></p>
+                                <p><strong>Loan Duration:</strong> <span id="displayLoanDays"></span> days</p>
+                                <p><strong>Daily Return:</strong> ₹<span id="dailyReturn"></span></p>
+                                <p><strong>Total Repayable:</strong> ₹<span id="totalRepay"></span></p>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="col-md-12 text-center mt-4">
+                            <button type="submit" class="btn btn-register" id="btnSubmit">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Loan Entry
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loan Details LIST TABLE -->
+        <div class="card mt-5 mb-5">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list me-2"></i> Loan Details List</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle" id="tblLoan">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col"><i class="fas fa-hashtag"></i> Sr No</th>
+                                <th scope="col"><i class="fas fa-user"></i> Name</th>
+                                <th scope="col"><i class="fas fa-phone"></i> Loan Amount</th>
+                                <th scope="col"><i class="fas fa-home"></i> Duration </th>
+                                <th scope="col"><i class="fas fa-home"></i> Interest </th>
+                                <th scope="col" class="text-center"><i class="fas fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblLoantbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="container text-center">
+        © 2025 Admin Panel | Designed for Funds
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Toastr JS (after jQuery) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/Scripts/Funds_Scripts/Loan.js"></script>
+
+    <script>
+        function calculateLoan() {
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value) || 0;
+            const loanDays = parseInt(document.getElementById('loanDays').value) || 0;
+            const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+
+            // 🔹 Validation using Toastr
+            if (loanAmount <= 0) {
+                toastr.error("Please enter a valid Loan Amount");
+                return;
+            }
+            if (loanDays <= 0) {
+                toastr.error("Please enter valid Days");
+                return;
+            }
+            if (interestRate <= 0) {
+                toastr.error("Please enter a valid Interest Rate");
+                return;
+            }
+
+            // 🔹 Round up days to next full 30-day block
+            const totalMonths = Math.ceil(loanDays / 30);   // e.g., 80 → 3 months
+            const totalInterestPercent = interestRate * totalMonths;  // e.g., 5% × 3 = 15%
+            const deductedInterest = (loanAmount * totalInterestPercent) / 100;
+            const givenAmount = loanAmount - deductedInterest;
+
+            // 🔹 Daily and total repayment
+            const dailyReturn = (loanAmount / loanDays).toFixed(2);
+            const totalRepay = (dailyReturn * loanDays).toFixed(2);
+
+            // 🔹 Display results
+            document.getElementById('resultBox').style.display = 'block';
+            document.getElementById('displayLoanAmount').textContent = loanAmount.toLocaleString();
+            document.getElementById('deductedInterest').textContent = Math.round(deductedInterest).toLocaleString();
+            document.getElementById('givenAmount').textContent = Math.round(givenAmount).toLocaleString();
+            document.getElementById('displayLoanDays').textContent = `${loanDays} days (${totalMonths} month${totalMonths > 1 ? 's' : ''})`;
+            document.getElementById('dailyReturn').textContent = dailyReturn.toLocaleString();
+            document.getElementById('totalRepay').textContent = totalRepay.toLocaleString();
+
+            // 🔹 Success Message
+            toastr.success("Loan calculation successful!");
+
+            // Optional debug log
+            console.log({
+                loanAmount,
+                loanDays,
+                totalMonths,
+                interestRate,
+                totalInterestPercent,
+                deductedInterest,
+                givenAmount,
+                dailyReturn,
+                totalRepay
+            });
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#customerName').select2({
+                placeholder: "-- Select Customer --",
+                allowClear: true,
+                width: '100%' // makes it responsive
+            });
+        });
+    </script>
+
+
+
+</body>
+</html>

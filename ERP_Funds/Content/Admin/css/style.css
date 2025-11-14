@@ -1,0 +1,237 @@
+﻿/* Warm gradient background */
+body {
+    background: linear-gradient(135deg, #ff9a3c, #ff6f3c, #b23c17);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+}
+
+/* Background animated circles */
+.background-circles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.15), rgba(255,111,60,0.2));
+    animation: moveCircle 20s infinite alternate ease-in-out;
+}
+
+.circle1 {
+    width: 200px;
+    height: 200px;
+    top: 10%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.circle2 {
+    width: 300px;
+    height: 300px;
+    bottom: 10%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+.circle3 {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    left: 5%;
+    animation-delay: 4s;
+}
+
+.circle4 {
+    width: 250px;
+    height: 250px;
+    top: 10%;
+    right: 5%;
+    animation-delay: 6s;
+}
+
+.circle5 {
+    width: 180px;
+    height: 180px;
+    bottom: 5%;
+    left: 40%;
+    animation-delay: 8s;
+}
+
+@keyframes moveCircle {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(40px, -40px) scale(1.1);
+    }
+
+    100% {
+        transform: translate(-40px, 40px) scale(0.9);
+    }
+}
+
+/* Card container */
+.login-card {
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 450px;
+    animation: fadeIn 1s ease-in-out;
+    z-index: 1;
+}
+
+/* Smooth entry animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card h3 {
+    color: #d24700;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.sub-head {
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #555;
+}
+
+/* Input group styling */
+.input-group-text {
+    background-color: #fff;
+    border-right: none;
+    color: #d24700;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+}
+
+.input-group:focus-within .input-group-text {
+    color: #ff6f3c;
+}
+
+/* Eye icon button */
+.eye-toggle {
+    cursor: pointer;
+    border-left: none;
+    color: #b23c17;
+}
+
+    .eye-toggle:hover {
+        color: #ff6f3c;
+    }
+
+/* Button */
+.btn-login {
+    background-color: #ff6f3c;
+    color: white;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+    .btn-login:hover {
+        background-color: #cd3100;
+        transform: translateY(-2px);
+        color: white;
+        font-weight: 500;
+    }
+
+a {
+    color: #b23c17;
+    text-decoration: none;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+/* Big circular icon above heading */
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #ff9a3c, #ff6f3c, #b23c17);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+    color: #fff;
+    font-size: 45px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    position: relative;
+    animation: floatIcon 4s ease-in-out infinite;
+}
+
+    /* Soft glowing ring effect */
+    .icon-circle::after {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        top: -10px;
+        left: -10px;
+        animation: pulseGlow 3s ease-in-out infinite alternate;
+    }
+
+/* Floating animation */
+@keyframes floatIcon {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Glowing ring pulse animation */
+@keyframes pulseGlow {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+}

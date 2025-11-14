@@ -1,0 +1,207 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Reports</title>
+
+    <link href="~/Content/Admin/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="~/Content/Admin/css/admin.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/Content/Admin/img/computer.png" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cogs me-2"></i>AdminPanel
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="~/Customer/Index"><i class="fas fa-users me-1"></i>Customer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="~/Loan/Index"><i class="fas fa-hand-holding-usd me-1"></i>Loan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="~/DailyEntry/Index"><i class="fas fa-calendar-day me-1"></i>Daily Entry</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="~/Reports/Index"><i class="fas fa-chart-bar me-1"></i>Reports</a></li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link logout-btn" href="~/Login/Index"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header mb-3">
+            <h2><i class="fas fa-chart-line me-2"></i>Reports</h2>
+            <p class="text-muted">View, filter, and download reports by customer and date range.</p>
+        </div>
+
+        <!-- FILTER SECTION CARD -->
+        <div class="card mt-4 mb-4 shadow-sm">
+            <div class="card-header">
+                <i class="fas fa-filter me-2"></i>Filter Reports
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Customer Filter Dropdown -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="customerName" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-user text-warning me-1"></i> Customer Name
+                            </label>
+                            <div class="input-group">
+                                <select id="customerName" name="customerName" class="form-select shadow-sm border px-3" required>
+                                    <option value="">-- Select Customer --</option>
+                                    @if (ViewBag.CustomerList != null)
+                                    {
+                                        foreach (var cust in ViewBag.CustomerList as SelectList)
+                                        {
+                                            <option value="@cust.Value">@cust.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">
+                            <i class="fas fa-calendar-alt"></i> Start Date
+                        </label>
+                        <input type="date" id="startDate" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">
+                            <i class="fas fa-calendar-alt"></i> End Date
+                        </label>
+                        <input type="date" id="endDate" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end justify-content-center">
+                        <div class="d-flex flex-column w-100">
+                            <button class="btn btn-primary mb-2" id="btnFilter">
+                                <i class="fas fa-search me-1"></i> Filter
+                            </button>
+                            <button class="btn btn-download" id="btnDownload">
+                                <i class="fas fa-file-excel me-1"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORT TABLE CARD -->
+        <div class="card mb-5">
+            <div class="card-header">
+                <i class="fas fa-list me-2"></i>Report List
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tblReports" class="table table-striped table-bordered align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> Sr No</th>
+                                <th><i class="fas fa-user"></i> Customer Name</th>
+                                <th><i class="fas fa-calendar-day"></i> Date</th>
+                                <th><i class="fas fa-rupee-sign"></i> Amount</th>
+                                <th><i class="fas fa-check-circle"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblReportBody">
+                            <!-- Data loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="container text-center py-3 border-top">
+        © 2025 Admin Panel | Designed for Funds
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var table = $('#tblReports').DataTable();
+
+            // Load customers dynamically
+            $.ajax({
+                url: '/API/Customer/GetCustomerList',
+                type: 'GET',
+                success: function (data) {
+                    $('#ddlCustomer').empty().append('<option value="">-- Select Customer --</option>');
+                    $.each(data, function (i, item) {
+                        $('#ddlCustomer').append(`<option value="${item.CustomerId}">${item.CustomerName}</option>`);
+                    });
+                },
+                error: function () {
+                    toastr.error('Failed to load customer list.');
+                }
+            });
+
+            // Filter button
+            $('#btnFilter').click(function () {
+                var custId = $('#ddlCustomer').val();
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+
+                $.ajax({
+                    url: '/API/Reports/GetFilteredReports',
+                    type: 'GET',
+                    data: { CustomerId: custId, StartDate: startDate, EndDate: endDate },
+                    success: function (data) {
+                        table.clear();
+                        var sr = 1;
+                        $.each(data, function (i, report) {
+                            table.row.add([
+                                sr++,
+                                report.CustomerName,
+                                report.Date,
+                                report.Amount,
+                                report.Status
+                            ]);
+                        });
+                        table.draw();
+                    },
+                    error: function () {
+                        toastr.error('Error fetching report data.');
+                    }
+                });
+            });
+
+            // Download Excel
+            $('#btnDownload').click(function () {
+                var custId = $('#ddlCustomer').val();
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                window.location.href = `/Reports/DownloadExcel?CustomerId=${custId}&StartDate=${startDate}&EndDate=${endDate}`;
+            });
+        });
+    </script>
+</body>
+</html>

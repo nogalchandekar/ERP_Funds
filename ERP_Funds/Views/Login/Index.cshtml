@@ -1,0 +1,108 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+
+    <link href="~/Content/Admin/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Admin/css/style.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="~/Content/Admin/img/computer.png" />
+</head>
+
+<body>
+    <div class="background-circles">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+        <div class="circle circle5"></div>
+    </div>
+
+    <div class="login-card">
+        <div class="icon-circle">
+            <i class="fa-solid fa-user-lock"></i>
+        </div>
+        <h3>Welcome Back</h3>
+        <p class="sub-head">Enter your login credentials to access your Admin Panel</p>
+
+        <form method="post" action="/Login/Index">
+            <!-- Email -->
+            <div class="mb-3 position-relative">
+                <label for="email" class="form-label">Email address</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="text" class="form-control" id="UserName" name="UserName" placeholder="Enter your username" required>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3 position-relative">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" class="form-control" id="Password" name="Password" placeholder="Enter your password" required>
+                    <span class="input-group-text eye-toggle" onclick="togglePassword()">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-login w-100 py-2 mt-4">Login</button>
+        </form>
+    </div>
+
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="~/Content/Admin/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function togglePassword() {
+            const password = document.getElementById("Password");
+            const eyeIcon = document.getElementById("eyeIcon");
+            if (password.type === "password") {
+                password.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                password.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        }
+
+        // ✅ Toastr configuration
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "2000"
+        };
+
+        // ✅ Show success/error from TempData
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                toastr.success('@TempData["Success"]');
+                // Redirect after 2 sec delay
+                setTimeout(function () {
+                    window.location.href = '/Customer/Index';
+                }, 2000);
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                toastr.error('@TempData["Error"]');
+            </text>
+        }
+    </script>
+</body>
+</html>

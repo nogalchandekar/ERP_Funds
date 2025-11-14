@@ -1,0 +1,158 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Daily Entry</title>
+    <link href="~/Content/Admin/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="~/Content/Admin/css/admin.css" rel="stylesheet" />
+    <!-- Toastr -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/Content/Admin/img/computer.png" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-cogs me-2"></i>AdminPanel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="~/Customer/Index"><i class="fas fa-users me-1"></i>Customer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="~/Loan/Index"><i class="fas fa-hand-holding-usd me-1"></i>Loan</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="~/DailyEntry/Index"><i class="fas fa-calendar-day me-1"></i>Daily Entry</a></li>
+                    <li class="nav-item"><a class="nav-link" href="~/ExcelReport/Index"><i class="fas fa-chart-bar me-1"></i>Reports</a></li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link logout-btn" href="~/Login/Index"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="container">
+        <div class="page-header mt-4">
+            <h2><i class="fas fa-calendar-day me-2"></i>Daily Entry</h2>
+            <p class="text-muted">Search customer, add or update their daily entries.</p>
+        </div>
+
+        <!-- SELECT CUSTOMER -->
+        <div class="card mt-4">
+            <div class="card-header"><i class="fas fa-user me-2"></i>Select Customer</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Customer Name -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="customerName" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-user text-warning me-1"></i> Customer Name
+                            </label>
+                            <div class="input-group">
+                                <select id="customerName" name="customerName" class="form-select shadow-sm border px-3" required>
+                                    <option value="">-- Select Customer --</option>
+                                    @if (ViewBag.CustomerList != null)
+                                    {
+                                        foreach (var cust in ViewBag.CustomerList as SelectList)
+                                        {
+                                            <option value="@cust.Value">@cust.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 pt-4">
+                        <button id="btnLoadEntries" class="btn btn-primary w-100 mt-2"><i class="fas fa-search me-2"></i>Load Entries</button>
+                    </div>
+                    <div class="col-md-3 text-end pt-4">
+                        <a id="btnOpenDetails" class="btn btn-success w-100 mt-2" href="#" target="_blank">
+                            <i class="fas fa-info-circle me-2"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD ENTRY -->
+        <div class="card mt-4">
+            <div class="card-header"><i class="fas fa-plus-circle me-2"></i>New Entry</div>
+            <div class="card-body">
+                <form id="formDailyEntry">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Date</label>
+                            <input type="date" id="entryDate" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label"><i class="fas fa-indian-rupee-sign"></i> Amount</label>
+                            <input type="number" id="entryAmount" class="form-control" placeholder="Enter amount" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label"><i class="fas fa-note-sticky"></i> Remark</label>
+                            <input type="text" id="entryRemark" class="form-control" placeholder="Optional">
+                        </div>
+                        <div class="col-12 text-center mt-3">
+                            <button type="submit" class="btn btn-register"><i class="fas fa-save me-2"></i>Save Entry</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ENTRIES LIST -->
+        <div class="card mt-5 mb-5">
+            <div class="card-header"><i class="fas fa-list me-2"></i>Daily Entry List</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle" id="tblEntries">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> Sr No</th>
+                                <th><i class="fas fa-calendar-alt"></i> Date</th>
+                                <th><i class="fas fa-user"></i> Customer</th>
+                                <th><i class="fas fa-indian-rupee-sign"></i> Amount</th>
+                                <th><i class="fas fa-note-sticky"></i> Remark</th>
+                                <th class="text-center"><i class="fas fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblEntriesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="container text-center py-3 border-top">
+        © 2025 Admin Panel | Designed for Funds
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/Scripts/Funds_Scripts/DailyEntry.js"></script>
+</body>
+</html>
