@@ -30,6 +30,8 @@ namespace ERP_Funds.DAL
 							MobileNo = vMCustomer.MobileNo,
 							EmailId = vMCustomer.EmailId,
 							Address = vMCustomer.Address,
+							PanNo = vMCustomer.PanNo,
+							AdhaarNo = vMCustomer.AdhaarNo,
 							CreatedBy = HttpContext.Current.Session["UserName"] as string,
 							CreatedDate = DateTime.Now ,
 							IsActive = true
@@ -46,6 +48,8 @@ namespace ERP_Funds.DAL
 						customer.MobileNo = vMCustomer.MobileNo;
 						customer.EmailId = vMCustomer.EmailId;
 						customer.Address = vMCustomer.Address;
+						customer.PanNo = vMCustomer.PanNo;
+						customer.AdhaarNo = vMCustomer.AdhaarNo;
 						customer.IsActive = true;
 						customer.ModifiedBy = HttpContext.Current.Session["UserName"] as string;
 						customer.ModifiedDate = DateTime.Now;
@@ -82,6 +86,8 @@ namespace ERP_Funds.DAL
 								 MobileNo = cust.MobileNo,
 								 EmailId = cust.EmailId,
 								 Address = cust.Address,
+								 PanNo = cust.PanNo,
+								 AdhaarNo = cust.AdhaarNo,
 								 CreatedBy = cust.CreatedBy,
 								 CreatedDate = cust.CreatedDate,
 								 ModifiedBy = cust.ModifiedBy,
@@ -110,6 +116,8 @@ namespace ERP_Funds.DAL
 								  MobileNo = cust.MobileNo,
 								  EmailId = cust.EmailId,
 								  Address = cust.Address,
+								  PanNo = cust.PanNo,
+								  AdhaarNo = cust.AdhaarNo,
 								  CreatedBy = cust.CreatedBy,
 								  CreatedDate = cust.CreatedDate,
 								  ModifiedBy = cust.ModifiedBy,

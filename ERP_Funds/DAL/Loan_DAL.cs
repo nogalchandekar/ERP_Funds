@@ -11,20 +11,55 @@ namespace ERP_Funds.DAL
     {
         db_FundsEntities db = new db_FundsEntities();
 
-        public string AddData(VMLoan vMLoan)
-        {
-            using (var transaction = db.Database.BeginTransaction())
-            {
-                try
-                {
-                    tblLoan tblLoan = db.tblLoans
-                        .FirstOrDefault(x => x.LoanId == vMLoan.LoanId);
 
+		public string AddData(VMLoan vMLoan)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				try
+				{
+					// Check if loan exists (update)
+					tblLoan tblLoan = db.tblLoans
+						.FirstOrDefault(x => x.LoanId == vMLoan.LoanId);
+
+					// ===================================================
+					// INSERT NEW LOAN
+					// ===================================================
 					if (tblLoan == null)
 					{
-                        tblLoan = new tblLoan
-                        {
-							LoanId = vMLoan.LoanId,
+						// ======= GET CUSTOMER NAME =======
+						var customer = db.tblCustomers
+										 .FirstOrDefault(c => c.C_Id == vMLoan.CustomerId);
+
+						if (customer == null)
+							return "Error: Customer not found.";
+
+						string customerName = customer.CustomerName.Trim().Replace(" ", "");
+
+						// ======= FIND LAST LOANNO FOR THIS CUSTOMER =======
+						var lastLoan = db.tblLoans
+										 .Where(x => x.CustomerId == vMLoan.CustomerId)
+										 .OrderByDescending(x => x.LoanId)
+										 .FirstOrDefault();
+
+						int nextNumber = 1;
+						if (lastLoan != null && !string.IsNullOrEmpty(lastLoan.LoanNo))
+						{
+							// Extract numeric part after last '-'
+							string[] parts = lastLoan.LoanNo.Split('-');
+							int lastNum;
+							if (parts.Length == 2 && int.TryParse(parts[1], out lastNum))
+							{
+								nextNumber = lastNum + 1;
+							}
+						}
+
+						// ======= FORMAT LOANNO =======
+						string newLoanNo = $"{customerName}-{nextNumber.ToString("0000")}";
+
+						// ======= SAVE NEW LOAN =======
+						tblLoan = new tblLoan
+						{
 							CustomerId = vMLoan.CustomerId,
 							LoanAmount = vMLoan.LoanAmount,
 							LoanDurationDays = vMLoan.LoanDurationDays,
@@ -34,46 +69,128 @@ namespace ERP_Funds.DAL
 							LoanDurationWithMonths = vMLoan.LoanDurationWithMonths,
 							DailyReturn = vMLoan.DailyReturn,
 							TotalPayable = vMLoan.TotalPayable,
+
+							LoanNo = newLoanNo,   // STRING VALUE LIKE Nogal-0001
+
 							IsActive = true,
 							CreatedBy = HttpContext.Current.Session["UserName"] as string,
-                            CreatedDate = DateTime.Now,
+							CreatedDate = DateTime.Now,
 						};
-                        db.tblLoans.Add(tblLoan);
-                        db.SaveChanges();
-                        transaction.Commit();
-                        return "Loan Details Added Successfully";
+
+						db.tblLoans.Add(tblLoan);
+						db.SaveChanges();
+						transaction.Commit();
+
+						return "Loan Details Added Successfully";
 					}
-                    else
-                    {
-                        tblLoan.CustomerId = vMLoan.CustomerId;
-                        tblLoan.LoanAmount = vMLoan.LoanAmount; 
-                        tblLoan.LoanDurationDays = vMLoan.LoanDurationDays;
-                        tblLoan.LoanInterest = vMLoan.LoanInterest;
-                        tblLoan.DeductAmount = vMLoan.DeductAmount;
-                        tblLoan.AmountGivenToCustomer = vMLoan.AmountGivenToCustomer;
-                        tblLoan.LoanDurationWithMonths = vMLoan.LoanDurationWithMonths;
-                        tblLoan.DailyReturn = vMLoan.DailyReturn;
-                        tblLoan.TotalPayable = vMLoan.TotalPayable;
-                        tblLoan.IsActive = true;
-                        tblLoan.ModifiedBy = HttpContext.Current.Session["UserName"] as string;
-                        tblLoan.ModifiedDate = DateTime.Now;
-                        db.Entry(tblLoan).State = System.Data.Entity.EntityState.Modified;
-                        db.SaveChanges();
-                        transaction.Commit();
-                        return "Loan Details Updated Successfully";
+
+					// ===================================================
+					// UPDATE EXISTING LOAN
+					// ===================================================
+					else
+					{
+						tblLoan.CustomerId = vMLoan.CustomerId;
+						tblLoan.LoanAmount = vMLoan.LoanAmount;
+						tblLoan.LoanDurationDays = vMLoan.LoanDurationDays;
+						tblLoan.LoanInterest = vMLoan.LoanInterest;
+						tblLoan.DeductAmount = vMLoan.DeductAmount;
+						tblLoan.AmountGivenToCustomer = vMLoan.AmountGivenToCustomer;
+						tblLoan.LoanDurationWithMonths = vMLoan.LoanDurationWithMonths;
+						tblLoan.DailyReturn = vMLoan.DailyReturn;
+						tblLoan.TotalPayable = vMLoan.TotalPayable;
+
+						// DO NOT CHANGE LoanNo ON UPDATE
+
+						tblLoan.IsActive = true;
+						tblLoan.ModifiedBy = HttpContext.Current.Session["UserName"] as string;
+						tblLoan.ModifiedDate = DateTime.Now;
+
+						db.Entry(tblLoan).State = System.Data.Entity.EntityState.Modified;
+						db.SaveChanges();
+						transaction.Commit();
+
+						return "Loan Details Updated Successfully";
 					}
 				}
-                catch (Exception ex)
-                {
+				catch (Exception ex)
+				{
 					transaction.Rollback();
-					Console.WriteLine("Error" + ex.Message);
 					var errorMessage = ex.InnerException?.InnerException?.Message ?? ex.Message;
 					return "Error: " + errorMessage;
 				}
-            }
-	    }
+			}
+		}
 
-        public List<VMLoan> getList()
+
+
+
+		//    public string AddData(VMLoan vMLoan)
+		//    {
+		//        using (var transaction = db.Database.BeginTransaction())
+		//        {
+		//            try
+		//            {
+		//                tblLoan tblLoan = db.tblLoans
+		//                    .FirstOrDefault(x => x.LoanId == vMLoan.LoanId);
+
+		//	if (tblLoan == null)
+		//	{
+		//                    tblLoan = new tblLoan
+		//                    {
+		//			LoanId = vMLoan.LoanId,
+		//			CustomerId = vMLoan.CustomerId,
+		//			LoanAmount = vMLoan.LoanAmount,
+		//			LoanDurationDays = vMLoan.LoanDurationDays,
+		//			LoanInterest = vMLoan.LoanInterest,
+		//			DeductAmount = vMLoan.DeductAmount,
+		//			AmountGivenToCustomer = vMLoan.AmountGivenToCustomer,
+		//			LoanDurationWithMonths = vMLoan.LoanDurationWithMonths,
+		//			DailyReturn = vMLoan.DailyReturn,
+		//			TotalPayable = vMLoan.TotalPayable,
+		//                        LoanNo = vMLoan.LoanNo,
+		//			IsActive = true,
+		//			CreatedBy = HttpContext.Current.Session["UserName"] as string,
+		//                        CreatedDate = DateTime.Now,
+		//		};
+		//                    db.tblLoans.Add(tblLoan);
+		//                    db.SaveChanges();
+		//                    transaction.Commit();
+		//                    return "Loan Details Added Successfully";
+		//	}
+		//                else
+		//                {
+		//                    tblLoan.CustomerId = vMLoan.CustomerId;
+		//                    tblLoan.LoanAmount = vMLoan.LoanAmount; 
+		//                    tblLoan.LoanDurationDays = vMLoan.LoanDurationDays;
+		//                    tblLoan.LoanInterest = vMLoan.LoanInterest;
+		//                    tblLoan.DeductAmount = vMLoan.DeductAmount;
+		//                    tblLoan.AmountGivenToCustomer = vMLoan.AmountGivenToCustomer;
+		//                    tblLoan.LoanDurationWithMonths = vMLoan.LoanDurationWithMonths;
+		//                    tblLoan.DailyReturn = vMLoan.DailyReturn;
+		//                    tblLoan.TotalPayable = vMLoan.TotalPayable;
+		//                    tblLoan.IsActive = true;
+		//                    tblLoan.ModifiedBy = HttpContext.Current.Session["UserName"] as string;
+		//                    tblLoan.ModifiedDate = DateTime.Now;
+		//                    db.Entry(tblLoan).State = System.Data.Entity.EntityState.Modified;
+		//                    db.SaveChanges();
+		//                    transaction.Commit();
+		//                    return "Loan Details Updated Successfully";
+		//	}
+		//}
+		//            catch (Exception ex)
+		//            {
+		//	transaction.Rollback();
+		//	Console.WriteLine("Error" + ex.Message);
+		//	var errorMessage = ex.InnerException?.InnerException?.Message ?? ex.Message;
+		//	return "Error: " + errorMessage;
+		//}
+		//        }
+		// }
+
+
+
+
+		public List<VMLoan> getList()
         {
             List<VMLoan> vMLoans = new List<VMLoan>();
 

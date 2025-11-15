@@ -50,6 +50,8 @@ function renderGrid(data) {
                 <td data-label="Name">${row.CustomerName || ''}</td>
                 <td data-label="Phone">${row.MobileNo || ''}</td>
                 <td data-label="Address">${row.Address || ''}</td>
+                <td data-label="AdhaarNo">${row.AdhaarNo || ''}</td>
+                <td data-label="PanNo">${row.PanNo || ''}</td>
                 <td class="text-center" data-label="Actions">
                     <button class="btn btn-sm btn-primary edit-icon" data-id="${row.C_Id}">
                         <i class="fas fa-edit"></i> Edit
@@ -104,6 +106,8 @@ function EditCustomer(C_Id) {
                 $('#Name').val(response.CustomerName);
                 $('#phone').val(response.MobileNo);
                 $('#address').val(response.Address);
+                $('#aadharcard').val(response.AdhaarNo);
+                $('#pancard').val(response.PanNo);
                 $('#btnSubmit').html('<i class="fas fa-save me-2"></i>Update Customer');
             } else {
                 toastr.error("Customer not found.");
@@ -150,7 +154,9 @@ function getCustomerModel() {
         C_Id: $("#hdncustomerid").val() || 0,
         CustomerName: $("#Name").val().trim(),
         MobileNo: $("#phone").val().trim(),
-        Address: $("#address").val().trim()
+        Address: $("#address").val().trim() ,
+        AdhaarNo: $("#aadharcard").val().trim() ,
+        PanNo: $("#pancard").val().trim()
     };
 }
 
@@ -168,6 +174,8 @@ function clearForm() {
     $('#Name').val('');
     $('#phone').val('');
     $('#address').val('');
+    $('#aadharcard').val('');
+    $('#pancard').val('');
     $("#btnSubmit").html('<i class="fas fa-user-plus me-2"></i>Register Customer')
         .prop("disabled", false);
 }

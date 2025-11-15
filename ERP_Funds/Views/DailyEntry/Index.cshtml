@@ -58,11 +58,12 @@
             <div class="card-header"><i class="fas fa-user me-2"></i>Select Customer</div>
             <div class="card-body">
                 <div class="row g-3">
+
                     <!-- Customer Name -->
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label for="customerName" class="form-label fw-semibold text-dark">
-                                <i class="fas fa-user text-warning me-1"></i> Customer Name
+                                <i class="fas fa-user-circle text-primary me-1"></i> Customer Name
                             </label>
                             <div class="input-group">
                                 <select id="customerName" name="customerName" class="form-select shadow-sm border px-3" required>
@@ -79,43 +80,145 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3 pt-4">
-                        <button id="btnLoadEntries" class="btn btn-primary w-100 mt-2"><i class="fas fa-search me-2"></i>Load Entries</button>
+                    <!-- Loan Number -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="loanno" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-file-invoice-dollar text-success me-1"></i> Loan No
+                            </label>
+                            <div class="input-group">
+                                <select id="loanno" name="loanno" class="form-select shadow-sm border px-3" required>
+                                    <option value="">-- Select Loan No --</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3 text-end pt-4">
-                        <a id="btnOpenDetails" class="btn btn-success w-100 mt-2" href="#" target="_blank">
-                            <i class="fas fa-info-circle me-2"></i>View Details
-                        </a>
-                    </div>
+
                 </div>
             </div>
         </div>
 
         <!-- ADD ENTRY -->
         <div class="card mt-4">
-            <div class="card-header"><i class="fas fa-plus-circle me-2"></i>New Entry</div>
+            <div class="card-header">
+                <i class="fas fa-file-invoice-dollar me-2 text-primary"></i> LOAN SUMMARY
+            </div>
+
             <div class="card-body">
-                <form id="formDailyEntry">
+                <form id="formDailysummary">
+
+                    <!-- Row 1: Loan Amount / Loan Duration / Per Day Installment -->
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Date</label>
-                            <input type="date" id="entryDate" class="form-control" required>
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-indian-rupee-sign text-success me-1"></i> Loan Amount
+                            </label>
+                            <input type="text" id="loanamount" class="form-control" placeholder="Loan Amount" disabled>
                         </div>
+
                         <div class="col-md-4">
-                            <label class="form-label"><i class="fas fa-indian-rupee-sign"></i> Amount</label>
-                            <input type="number" id="entryAmount" class="form-control" placeholder="Enter amount" required>
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-clock text-primary me-1"></i> Loan Duration (Days)
+                            </label>
+                            <input type="number" id="loanduration" class="form-control" placeholder="Loan Duration" disabled>
                         </div>
+
                         <div class="col-md-4">
-                            <label class="form-label"><i class="fas fa-note-sticky"></i> Remark</label>
-                            <input type="text" id="entryRemark" class="form-control" placeholder="Optional">
-                        </div>
-                        <div class="col-12 text-center mt-3">
-                            <button type="submit" class="btn btn-register"><i class="fas fa-save me-2"></i>Save Entry</button>
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-coins text-warning me-1"></i> Per Day Installment
+                            </label>
+                            <input type="text" id="perdayinstallment" class="form-control" placeholder="Per Day Installment" disabled>
                         </div>
                     </div>
+
+                    <!-- Row 2: Total Paid / Pending Amount -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-money-bill-wave text-success me-1"></i> Total Paid
+                            </label>
+                            <input type="text" id="totalpaid" class="form-control" placeholder="Total Paid" disabled>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-hourglass-half text-danger me-1"></i> Pending Amount
+                            </label>
+                            <input type="text" id="pendingamount" class="form-control" placeholder="Pending Amount" disabled>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Days Paid / Remaining Days -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar-check text-info me-1"></i> Days Paid
+                            </label>
+                            <input type="text" id="dayspaid" class="form-control" placeholder="Days Paid" disabled>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar-times text-warning me-1"></i> Remaining Days
+                            </label>
+                            <input type="text" id="remainingdays" class="form-control" placeholder="Remaining Days" disabled>
+                        </div>
+                    </div>
+
+
+
                 </form>
             </div>
+
         </div>
+
+
+
+        <div class="card-header">
+            <i class="fas fa-file-invoice-dollar me-2 text-primary"></i>
+            TODAY'S ENTRY FORM
+        </div>
+
+        <div class="card-body">
+            <form id="formDailyEntry">
+
+                <!-- Row 1 -->
+                <div class="row g-3 mt-1">
+
+                    <!-- Installment Date -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-calendar-day text-primary me-1"></i>
+                            Installment Date
+                        </label>
+                        <input type="date" id="todaydate" class="form-control" placeholder="Select Date">
+                    </div>
+
+                    <!-- Amount Paid Today -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-hand-holding-usd text-success me-1"></i>
+                            Amount Paid Today
+                        </label>
+                        <input type="text" id="paidtoday" class="form-control" placeholder="Enter Amount">
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+
+
+
+
+        <!-- Save Button -->
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-register px-4">
+                <i class="fas fa-save me-2"></i> Save Entry
+            </button>
+        </div>
+
+
 
         <!-- ENTRIES LIST -->
         <div class="card mt-5 mb-5">
@@ -152,7 +255,17 @@
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="~/Scripts/Funds_Scripts/DailyEntry.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let today = new Date().toISOString().split("T")[0];
+            document.getElementById("todaydate").value = today;
+        });
+    </script>
+
 </body>
+
+
+
+
 </html>

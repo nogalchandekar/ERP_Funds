@@ -17,5 +17,7 @@ namespace ERP_Funds.Models.ViewModel
 		public string ModifiedBy { get; set; }
 		public Nullable<System.DateTime> ModifiedDate { get; set; }
 		public Nullable<bool> IsActive { get; set; }
+		public string AdhaarNo { get; set; }
+		public string PanNo { get; set; }
 	}
 }

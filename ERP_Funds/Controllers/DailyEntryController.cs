@@ -1,34 +1,46 @@
-﻿using ERP_Funds.Models.DataModel;
-using ERP_Funds.Models.ViewModel;
+﻿using ERP_Funds.DAL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
+using System.Web.Mvc;
 
-namespace ERP_Funds.DAL
+namespace ERP_Funds.Controllers
 {
-    public class DailyEntry_DAL
+    public class DailyEntryController : Controller
     {
-        db_FundsEntities db = new db_FundsEntities();
+		// GET: DailyEntry
+		DailyEntry_DAL dailyEntryDAL = new DailyEntry_DAL();
 
-        public List<VMCustomer> GetCustomerList()
-        {
-            List<VMCustomer> vMCustomers = new List<VMCustomer>();
-            try
-            {
-                vMCustomers = (from cust in db.tblCustomers
-                               where cust.IsActive == true
-                               orderby cust.CustomerName
-                               select new VMCustomer
-                               {
-                                   C_Id = cust.C_Id,
-                                   CustomerName = cust.CustomerName
-                               }).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error while fetching customers: " + ex.Message);
-            }
-            return vMCustomers;
-        }
-    }
+		// GET: DailyEntry
+		public ActionResult Index()
+		{
+			// Fetch customer list from DAL
+			var customerList = dailyEntryDAL.GetCustomerList();
+
+			// Pass list to dropdown
+			if (customerList != null && customerList.Count > 0)
+				ViewBag.CustomerList = new SelectList(customerList, "C_Id", "CustomerName");
+			else
+				ViewBag.CustomerList = new SelectList(new List<SelectListItem>
+				{
+					new SelectListItem { Value = "", Text = "-- No Active Customers Found --" }
+				}, "Value", "Text");
+
+			return View();
+		}
+
+		[HttpGet]
+		public ActionResult getLoanById(int CustomerId)
+		{
+			return Json(dailyEntryDAL.getLoanById(CustomerId), JsonRequestBehavior.AllowGet);
+		}
+
+		[HttpGet]
+		public ActionResult getLoanSummaryById(int CustomerId, int LoanNoId)
+		{
+			return Json(dailyEntryDAL.getLoanSummaryById(CustomerId, LoanNoId), JsonRequestBehavior.AllowGet);
+		}
+
+	}
 }

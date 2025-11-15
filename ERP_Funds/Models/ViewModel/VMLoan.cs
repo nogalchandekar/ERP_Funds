@@ -17,6 +17,8 @@ namespace ERP_Funds.Models.ViewModel
 		public string LoanDurationWithMonths { get; set; }
 		public string DailyReturn { get; set; }
 		public string TotalPayable { get; set; }
+		public string LoanNo { get; set; }
+
 		public string CustomerName { get; set; }
 		public Nullable<bool> IsActive { get; set; }
 		public string CreatedBy { get; set; }

@@ -163,6 +163,9 @@
     <Compile Include="Models\DataModel\tblCustomer.cs">
       <DependentUpon>ERP_Funds.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DataModel\tblDailyCollection.cs">
+      <DependentUpon>ERP_Funds.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DataModel\tblLoan.cs">
       <DependentUpon>ERP_Funds.tt</DependentUpon>
     </Compile>
@@ -226,6 +229,7 @@
     </Content>
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\Funds_Scripts\Customer.js" />
+    <Content Include="Scripts\Funds_Scripts\DailyEntry.js" />
     <Content Include="Scripts\Funds_Scripts\Loan.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
