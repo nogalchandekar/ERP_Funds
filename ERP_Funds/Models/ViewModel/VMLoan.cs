@@ -25,5 +25,9 @@ namespace ERP_Funds.Models.ViewModel
 		public Nullable<System.DateTime> CreatedDate { get; set; }
 		public string ModifiedBy { get; set; }
 		public Nullable<System.DateTime> ModifiedDate { get; set; }
+		// in VMLoan (add)
+		public decimal TotalPaid { get; set; }
+		public decimal PendingAmount { get; set; }
+
 	}
 }

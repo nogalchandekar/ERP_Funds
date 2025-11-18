@@ -46,6 +46,36 @@
         });
     });
 
+    //// When LOAN NO is selected → Load summary values
+    //$("#loanno").on("change", function () {
+
+    //    let customerId = $("#customerName").val();
+    //    let loanNoId = $(this).val();
+
+    //    if (customerId === "" || loanNoId === "") return;
+
+    //    $.ajax({
+    //        url: "/DailyEntry/getLoanSummaryById",
+    //        type: "GET",
+    //        data: { CustomerId: customerId, LoanNoId: loanNoId },
+    //        success: function (response) {
+
+    //            if (response.length > 0) {
+
+    //                let loan = response[0];
+
+    //                // Fill textboxes
+    //                $("#loanamount").val(loan.LoanAmount);
+    //                $("#loanduration").val(loan.LoanDurationDays);
+    //                $("#perdayinstallment").val(loan.DailyReturn);
+    //                //$("#paidtoday").val(loan.DailyReturn);
+    //            }
+    //        }
+    //    });
+
+    //});
+
+
     // When LOAN NO is selected → Load summary values
     $("#loanno").on("change", function () {
 
@@ -64,16 +94,40 @@
 
                     let loan = response[0];
 
-                    // Fill textboxes
-                    $("#loanamount").val(loan.LoanAmount);
-                    $("#loanduration").val(loan.LoanDurationDays);
-                    $("#perdayinstallment").val(loan.DailyReturn);
-                    //$("#paidtoday").val(loan.DailyReturn);
+                    // Fill textboxes from server-calculated values
+                    $("#loanamount").val(Number(loan.LoanAmount).toFixed(2));
+                    $("#loanduration").val(loan.LoanDurationDays || loan.LoanDuration || '');
+                    $("#perdayinstallment").val(Number(loan.DailyReturn).toFixed(2));
+
+                    // Server should compute these and return them (TotalPaid & PendingAmount)
+                    if (typeof loan.TotalPaid !== "undefined") {
+                        $("#totalpaid").val(Number(loan.TotalPaid || 0).toFixed(2));
+                    } else {
+                        $("#totalpaid").val("0.00");
+                    }
+
+                    if (typeof loan.PendingAmount !== "undefined") {
+                        $("#pendingamount").val(Number(loan.PendingAmount || 0).toFixed(2));
+                    } else {
+                        // just compute fallback
+                        const la = parseFloat($("#loanamount").val()) || 0;
+                        const tp = parseFloat($("#totalpaid").val()) || 0;
+                        $("#pendingamount").val((la - tp).toFixed(2));
+                    }
+
+                    // set default paidtoday to per day installment if you want:
+                    // $("#paidtoday").val(Number(loan.DailyReturn).toFixed(2));
                 }
+            },
+            error: function () {
+                toastr.error("Failed to load loan summary.");
             }
         });
 
     });
+
+
+
 
     // Handle Add / Update button
     $("#btnSubmit").on('click', function () {
@@ -356,24 +410,50 @@ function deleteLoan(DailyCollectionId) {
 }
 
 
+//$("#paidtoday").on("input", function () {
+
+//    let pending = parseFloat($("#pendingamount").val()) || 0;
+//    let paid = parseFloat($(this).val()) || 0;
+
+//    // If pending <= 0 → disable textbox + button
+//    if (pending <= 0) {
+//        $(this).val(0);
+//        $("#paidtoday").prop("disabled", true);
+//        $("#btnSubmit").prop("disabled", true);
+//        return;
+//    } else {
+//        $("#paidtoday").prop("disabled", false);
+//        $("#btnSubmit").prop("disabled", false);
+//    }
+
+//    // If paidToday > pendingAmount → set paidToday = pendingAmount
+//    if (paid > pending) {
+//        $(this).val(pending);
+//    }
+//});
+
+
+
 $("#paidtoday").on("input", function () {
 
     let pending = parseFloat($("#pendingamount").val()) || 0;
-    let paid = parseFloat($(this).val()) || 0;
+    let paidRaw = $(this).val();
+    let paid = parseFloat(paidRaw) || 0;
 
     // If pending <= 0 → disable textbox + button
     if (pending <= 0) {
-        $(this).val(0);
-        $("#paidtoday").prop("disabled", true);
+        $(this).val("0.00");
+        $(this).prop("disabled", true);
         $("#btnSubmit").prop("disabled", true);
+        toastr.info("Loan is already fully paid / no pending amount.");
         return;
     } else {
-        $("#paidtoday").prop("disabled", false);
+        $(this).prop("disabled", false);
         $("#btnSubmit").prop("disabled", false);
     }
 
     // If paidToday > pendingAmount → set paidToday = pendingAmount
     if (paid > pending) {
-        $(this).val(pending);
+        $(this).val(pending.toFixed(2));
     }
 });
