@@ -46,6 +46,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClosedXML">
+      <HintPath>..\packages\ClosedXML.0.96.0\lib\net40\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.16.0\lib\net40\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -173,6 +179,8 @@
       <DependentUpon>ERP_Funds.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModel\VMCustomer.cs" />
+    <Compile Include="Models\ViewModel\VMDailyCollection.cs" />
+    <Compile Include="Models\ViewModel\VMExcelReport.cs" />
     <Compile Include="Models\ViewModel\VMLoan.cs" />
     <Compile Include="Models\ViewModel\VMLoginMaster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -230,6 +238,7 @@
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\Funds_Scripts\Customer.js" />
     <Content Include="Scripts\Funds_Scripts\DailyEntry.js" />
+    <Content Include="Scripts\Funds_Scripts\ExcelReport.js" />
     <Content Include="Scripts\Funds_Scripts\Loan.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

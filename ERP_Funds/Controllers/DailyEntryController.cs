@@ -1,4 +1,5 @@
 ﻿using ERP_Funds.DAL;
+using ERP_Funds.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,5 +43,30 @@ namespace ERP_Funds.Controllers
 			return Json(dailyEntryDAL.getLoanSummaryById(CustomerId, LoanNoId), JsonRequestBehavior.AllowGet);
 		}
 
+		[HttpPost]
+		public ActionResult AddDailyEntry(VMDailyCollection vMDaily)
+		{
+			return Json(dailyEntryDAL.AddDailyEntry(vMDaily), JsonRequestBehavior.AllowGet);
+		}
+
+		[HttpGet]
+		public ActionResult GetDailyCollectionsList(int customerId, int loanNoId)
+		{
+			var data = dailyEntryDAL.GetDailyCollectionsList(customerId, loanNoId);
+			return Json(data, JsonRequestBehavior.AllowGet);
+		}
+
+
+		[HttpGet]
+		public ActionResult GetDailyCollectionById(int DailyCollectionId)
+		{
+			return Json(dailyEntryDAL.GetDailyCollectionById(DailyCollectionId), JsonRequestBehavior.AllowGet);
+		}
+
+		[HttpPost]
+		public ActionResult DeleteDailyCollection(int DailyCollectionId)
+		{
+			return Json(dailyEntryDAL.DeleteDailyCollection(DailyCollectionId), JsonRequestBehavior.AllowGet);
+		}
 	}
 }

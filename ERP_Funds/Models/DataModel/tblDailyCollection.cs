@@ -19,7 +19,7 @@ namespace ERP_Funds.Models.DataModel
         public Nullable<int> LoanNoId { get; set; }
         public Nullable<decimal> LoanAmount { get; set; }
         public Nullable<int> LoanDuration { get; set; }
-        public Nullable<int> PerDayInstallment { get; set; }
+        public Nullable<decimal> PerDayInstallment { get; set; }
         public Nullable<decimal> TotalPaid { get; set; }
         public Nullable<decimal> PendingAmount { get; set; }
         public Nullable<int> DaysPaid { get; set; }

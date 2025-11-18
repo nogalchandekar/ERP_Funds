@@ -22,16 +22,6 @@
           <Property Name="AdhaarNo" Type="nvarchar" MaxLength="20" />
           <Property Name="PanNo" Type="nvarchar" MaxLength="25" />
         </EntityType>
-        <EntityType Name="tblLoginMaster">
-          <Key>
-            <PropertyRef Name="Login_Id" />
-          </Key>
-          <Property Name="Login_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="UserName" Type="nvarchar" MaxLength="100" />
-          <Property Name="Password" Type="nvarchar" MaxLength="50" />
-          <Property Name="UserRole" Type="nvarchar" MaxLength="50" />
-          <Property Name="IsActive" Type="bit" />
-        </EntityType>
         <EntityType Name="tblDailyCollections">
           <Key>
             <PropertyRef Name="DailyCollectionId" />
@@ -41,7 +31,7 @@
           <Property Name="LoanNoId" Type="int" />
           <Property Name="LoanAmount" Type="numeric" Precision="18" Scale="2" />
           <Property Name="LoanDuration" Type="int" />
-          <Property Name="PerDayInstallment" Type="int" />
+          <Property Name="PerDayInstallment" Type="numeric" Precision="18" Scale="2" />
           <Property Name="TotalPaid" Type="numeric" Precision="18" Scale="2" />
           <Property Name="PendingAmount" Type="numeric" Precision="18" Scale="2" />
           <Property Name="DaysPaid" Type="int" />
@@ -75,11 +65,21 @@
           <Property Name="ModifiedDate" Type="datetime" />
           <Property Name="LoanNo" Type="nvarchar" MaxLength="300" />
         </EntityType>
+        <EntityType Name="tblLoginMaster">
+          <Key>
+            <PropertyRef Name="Login_Id" />
+          </Key>
+          <Property Name="Login_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="100" />
+          <Property Name="Password" Type="nvarchar" MaxLength="50" />
+          <Property Name="UserRole" Type="nvarchar" MaxLength="50" />
+          <Property Name="IsActive" Type="bit" />
+        </EntityType>
         <EntityContainer Name="db_FundsModelStoreContainer">
           <EntitySet Name="tblCustomer" EntityType="Self.tblCustomer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblDailyCollections" EntityType="Self.tblDailyCollections" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblLoan" EntityType="Self.tblLoan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tblLoginMaster" EntityType="Self.tblLoginMaster" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tblDailyCollections" EntityType="Self.tblDailyCollections" Schema="user_ERPFunds" store:Type="Tables" />
-          <EntitySet Name="tblLoan" EntityType="Self.tblLoan" Schema="user_ERPFunds" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -87,9 +87,9 @@
       <Schema Namespace="db_FundsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="db_FundsEntities" annotation:LazyLoadingEnabled="true" >
           <EntitySet Name="tblCustomers" EntityType="db_FundsModel.tblCustomer" />
-          <EntitySet Name="tblLoginMasters" EntityType="db_FundsModel.tblLoginMaster" />
-          <EntitySet Name="tblLoans" EntityType="db_FundsModel.tblLoan" />
           <EntitySet Name="tblDailyCollections" EntityType="db_FundsModel.tblDailyCollection" />
+          <EntitySet Name="tblLoans" EntityType="db_FundsModel.tblLoan" />
+          <EntitySet Name="tblLoginMasters" EntityType="db_FundsModel.tblLoginMaster" />
         </EntityContainer>
         <EntityType Name="tblCustomer">
           <Key>
@@ -108,15 +108,27 @@
           <Property Name="AdhaarNo" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
           <Property Name="PanNo" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="tblLoginMaster">
+        <EntityType Name="tblDailyCollection">
           <Key>
-            <PropertyRef Name="Login_Id" />
+            <PropertyRef Name="DailyCollectionId" />
           </Key>
-          <Property Name="Login_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="UserRole" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DailyCollectionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerId" Type="Int32" />
+          <Property Name="LoanNoId" Type="Int32" />
+          <Property Name="LoanAmount" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="LoanDuration" Type="Int32" />
+          <Property Name="PerDayInstallment" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="TotalPaid" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="PendingAmount" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="DaysPaid" Type="Int32" />
+          <Property Name="RemainingDays" Type="Int32" />
+          <Property Name="TodaysDate" Type="DateTime" Precision="0" />
+          <Property Name="AmountPaidToday" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="IsActive" Type="Boolean" />
+          <Property Name="CreatedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="tblLoan">
           <Key>
@@ -139,27 +151,15 @@
           <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
           <Property Name="LoanNo" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="tblDailyCollection">
+        <EntityType Name="tblLoginMaster">
           <Key>
-            <PropertyRef Name="DailyCollectionId" />
+            <PropertyRef Name="Login_Id" />
           </Key>
-          <Property Name="DailyCollectionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CustomerId" Type="Int32" />
-          <Property Name="LoanNoId" Type="Int32" />
-          <Property Name="LoanAmount" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="LoanDuration" Type="Int32" />
-          <Property Name="PerDayInstallment" Type="Int32" />
-          <Property Name="TotalPaid" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="PendingAmount" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="DaysPaid" Type="Int32" />
-          <Property Name="RemainingDays" Type="Int32" />
-          <Property Name="TodaysDate" Type="DateTime" Precision="0" />
-          <Property Name="AmountPaidToday" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Login_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="UserRole" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="IsActive" Type="Boolean" />
-          <Property Name="CreatedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -185,14 +185,26 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tblLoginMasters">
-            <EntityTypeMapping TypeName="db_FundsModel.tblLoginMaster">
-              <MappingFragment StoreEntitySet="tblLoginMaster">
+          <EntitySetMapping Name="tblDailyCollections">
+            <EntityTypeMapping TypeName="db_FundsModel.tblDailyCollection">
+              <MappingFragment StoreEntitySet="tblDailyCollections">
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="IsActive" ColumnName="IsActive" />
-                <ScalarProperty Name="UserRole" ColumnName="UserRole" />
-                <ScalarProperty Name="Password" ColumnName="Password" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="Login_Id" ColumnName="Login_Id" />
+                <ScalarProperty Name="AmountPaidToday" ColumnName="AmountPaidToday" />
+                <ScalarProperty Name="TodaysDate" ColumnName="TodaysDate" />
+                <ScalarProperty Name="RemainingDays" ColumnName="RemainingDays" />
+                <ScalarProperty Name="DaysPaid" ColumnName="DaysPaid" />
+                <ScalarProperty Name="PendingAmount" ColumnName="PendingAmount" />
+                <ScalarProperty Name="TotalPaid" ColumnName="TotalPaid" />
+                <ScalarProperty Name="PerDayInstallment" ColumnName="PerDayInstallment" />
+                <ScalarProperty Name="LoanDuration" ColumnName="LoanDuration" />
+                <ScalarProperty Name="LoanAmount" ColumnName="LoanAmount" />
+                <ScalarProperty Name="LoanNoId" ColumnName="LoanNoId" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="DailyCollectionId" ColumnName="DailyCollectionId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -218,26 +230,14 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tblDailyCollections">
-            <EntityTypeMapping TypeName="db_FundsModel.tblDailyCollection">
-              <MappingFragment StoreEntitySet="tblDailyCollections">
-                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <EntitySetMapping Name="tblLoginMasters">
+            <EntityTypeMapping TypeName="db_FundsModel.tblLoginMaster">
+              <MappingFragment StoreEntitySet="tblLoginMaster">
                 <ScalarProperty Name="IsActive" ColumnName="IsActive" />
-                <ScalarProperty Name="AmountPaidToday" ColumnName="AmountPaidToday" />
-                <ScalarProperty Name="TodaysDate" ColumnName="TodaysDate" />
-                <ScalarProperty Name="RemainingDays" ColumnName="RemainingDays" />
-                <ScalarProperty Name="DaysPaid" ColumnName="DaysPaid" />
-                <ScalarProperty Name="PendingAmount" ColumnName="PendingAmount" />
-                <ScalarProperty Name="TotalPaid" ColumnName="TotalPaid" />
-                <ScalarProperty Name="PerDayInstallment" ColumnName="PerDayInstallment" />
-                <ScalarProperty Name="LoanDuration" ColumnName="LoanDuration" />
-                <ScalarProperty Name="LoanAmount" ColumnName="LoanAmount" />
-                <ScalarProperty Name="LoanNoId" ColumnName="LoanNoId" />
-                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
-                <ScalarProperty Name="DailyCollectionId" ColumnName="DailyCollectionId" />
+                <ScalarProperty Name="UserRole" ColumnName="UserRole" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Login_Id" ColumnName="Login_Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

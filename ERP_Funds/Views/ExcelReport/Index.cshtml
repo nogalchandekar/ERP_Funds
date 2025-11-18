@@ -59,49 +59,27 @@
             <div class="card-body">
                 <div class="row g-4">
                     <!-- Customer Filter Dropdown -->
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label for="customerName" class="form-label fw-semibold text-dark">
                                 <i class="fas fa-user text-warning me-1"></i> Customer Name
                             </label>
                             <div class="input-group">
-                                <select id="customerName" name="customerName" class="form-select shadow-sm border px-3" required>
-                                    <option value="">-- Select Customer --</option>
-                                    @if (ViewBag.CustomerList != null)
+                                <select id="customerName" class="form-select shadow-sm border px-3">
+                                    <option value="">-- All Customers --</option>
+                                    @foreach (var cust in ViewBag.CustomerList as SelectList)
                                     {
-                                        foreach (var cust in ViewBag.CustomerList as SelectList)
-                                        {
-                                            <option value="@cust.Value">@cust.Text</option>
-                                        }
+                                        <option value="@cust.Value">@cust.Text</option>
                                     }
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <label for="startDate" class="form-label">
-                            <i class="fas fa-calendar-alt"></i> Start Date
-                        </label>
-                        <input type="date" id="startDate" class="form-control" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label for="endDate" class="form-label">
-                            <i class="fas fa-calendar-alt"></i> End Date
-                        </label>
-                        <input type="date" id="endDate" class="form-control" />
-                    </div>
-
-                    <div class="col-md-2 d-flex align-items-end justify-content-center">
-                        <div class="d-flex flex-column w-100">
-                            <button class="btn btn-primary mb-2" id="btnFilter">
-                                <i class="fas fa-search me-1"></i> Filter
-                            </button>
-                            <button class="btn btn-download" id="btnDownload">
-                                <i class="fas fa-file-excel me-1"></i> Excel
-                            </button>
-                        </div>
+                    <div class="col-md-6 d-flex align-items-center justify-content-center">
+                        @*<button class="btn btn-download" id="btnDownload">
+                                <i class="fas fa-file-excel me-1"></i> All Customer Report
+                            </button>*@
                     </div>
                 </div>
             </div>
@@ -119,13 +97,14 @@
                             <tr>
                                 <th><i class="fas fa-hashtag"></i> Sr No</th>
                                 <th><i class="fas fa-user"></i> Customer Name</th>
-                                <th><i class="fas fa-calendar-day"></i> Date</th>
-                                <th><i class="fas fa-rupee-sign"></i> Amount</th>
-                                <th><i class="fas fa-check-circle"></i> Status</th>
+                                <th><i class="fas fa-user"></i> Loan No</th>
+                                <th><i class="fas fa-calendar-day"></i> Loan Amount</th>
+                                @*<th><i class="fas fa-rupee-sign"></i> Pending Amount</th>
+                                    <th><i class="fas fa-check-circle"></i> Status</th>*@
+                                <th><i class="fas fa-file-excel me-1"></i> Download Excel</th>
                             </tr>
                         </thead>
                         <tbody id="tblReportBody">
-                            <!-- Data loaded dynamically -->
                         </tbody>
                     </table>
                 </div>
@@ -144,64 +123,6 @@
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            var table = $('#tblReports').DataTable();
-
-            // Load customers dynamically
-            $.ajax({
-                url: '/API/Customer/GetCustomerList',
-                type: 'GET',
-                success: function (data) {
-                    $('#ddlCustomer').empty().append('<option value="">-- Select Customer --</option>');
-                    $.each(data, function (i, item) {
-                        $('#ddlCustomer').append(`<option value="${item.CustomerId}">${item.CustomerName}</option>`);
-                    });
-                },
-                error: function () {
-                    toastr.error('Failed to load customer list.');
-                }
-            });
-
-            // Filter button
-            $('#btnFilter').click(function () {
-                var custId = $('#ddlCustomer').val();
-                var startDate = $('#startDate').val();
-                var endDate = $('#endDate').val();
-
-                $.ajax({
-                    url: '/API/Reports/GetFilteredReports',
-                    type: 'GET',
-                    data: { CustomerId: custId, StartDate: startDate, EndDate: endDate },
-                    success: function (data) {
-                        table.clear();
-                        var sr = 1;
-                        $.each(data, function (i, report) {
-                            table.row.add([
-                                sr++,
-                                report.CustomerName,
-                                report.Date,
-                                report.Amount,
-                                report.Status
-                            ]);
-                        });
-                        table.draw();
-                    },
-                    error: function () {
-                        toastr.error('Error fetching report data.');
-                    }
-                });
-            });
-
-            // Download Excel
-            $('#btnDownload').click(function () {
-                var custId = $('#ddlCustomer').val();
-                var startDate = $('#startDate').val();
-                var endDate = $('#endDate').val();
-                window.location.href = `/Reports/DownloadExcel?CustomerId=${custId}&StartDate=${startDate}&EndDate=${endDate}`;
-            });
-        });
-    </script>
+    <script src="~/Scripts/Funds_Scripts/ExcelReport.js"></script>
 </body>
 </html>

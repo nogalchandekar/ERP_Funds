@@ -26,8 +26,8 @@ namespace ERP_Funds.Models.DataModel
         }
     
         public DbSet<tblCustomer> tblCustomers { get; set; }
-        public DbSet<tblLoginMaster> tblLoginMasters { get; set; }
-        public DbSet<tblLoan> tblLoans { get; set; }
         public DbSet<tblDailyCollection> tblDailyCollections { get; set; }
+        public DbSet<tblLoan> tblLoans { get; set; }
+        public DbSet<tblLoginMaster> tblLoginMasters { get; set; }
     }
 }
