@@ -206,6 +206,128 @@ namespace ERP_Funds.DAL
 		//	}
 
 		//}
+		//public string AddDailyEntry(VMDailyCollection vMDaily)
+		//{
+		//	using (var transaction = db.Database.BeginTransaction())
+		//	{
+		//		try
+		//		{
+		//			// Normalize incoming values
+		//			int loanId = vMDaily.LoanNoId ?? 0;
+		//			int customerId = vMDaily.CustomerId ?? 0;
+		//			decimal newAmount = vMDaily.AmountPaidToday ?? 0;
+
+		//			// Find existing record (edit) or null (insert)
+		//			tblDailyCollection existing = db.tblDailyCollections
+		//				.FirstOrDefault(x => x.DailyCollectionId == vMDaily.DailyCollectionId);
+
+		//			// Get all active rows of this loan
+		//			var existingRows = db.tblDailyCollections
+		//								 .Where(d => d.IsActive == true && d.LoanNoId == loanId)
+		//								 .ToList();
+
+		//			// SUM excluding current record (if update)
+		//			decimal sumExcludingThis;
+		//			if (existing != null)
+		//			{
+		//				sumExcludingThis = existingRows
+		//					.Where(x => x.DailyCollectionId != existing.DailyCollectionId)
+		//					.Sum(x => x.AmountPaidToday ?? 0);
+		//			}
+		//			else
+		//			{
+		//				sumExcludingThis = existingRows.Sum(x => x.AmountPaidToday ?? 0);
+		//			}
+
+		//			// TOTAL PAID INCLUDING NEW ENTRY
+		//			decimal cumulativeTotalPaid = sumExcludingThis + newAmount;
+
+		//			// Fetch loan
+		//			var loan = db.tblLoans.FirstOrDefault(l => l.LoanId == loanId);
+
+		//			decimal loanAmount = loan?.LoanAmount ?? 0;
+		//			decimal pending = loanAmount - cumulativeTotalPaid;
+		//			if (pending < 0) pending = 0;
+
+		//			// Compute Distinct Days Paid
+		//			var distinctDates = existingRows
+		//				.Where(x => existing == null || x.DailyCollectionId != existing.DailyCollectionId)
+		//				.Select(x => x.TodaysDate.HasValue ? x.TodaysDate.Value.Date : (DateTime?)null)
+		//				.Where(d => d != null)
+		//				.Select(d => d.Value)
+		//				.Distinct()
+		//				.ToList();
+
+		//			// include new date
+		//			DateTime incomingDate = vMDaily.TodaysDate?.Date ?? DateTime.Now.Date;
+		//			if (!distinctDates.Contains(incomingDate))
+		//				distinctDates.Add(incomingDate);
+
+		//			int daysPaid = distinctDates.Count;
+
+		//			// Remaining Days calculation
+		//			int loanDuration = loan?.LoanDurationDays ?? 0;
+		//			int remainingDays = Math.Max(loanDuration - daysPaid, 0);
+
+		//			// ---------------------- INSERT -----------------------
+		//			if (existing == null)
+		//			{
+		//				tblDailyCollection dailyCollection = new tblDailyCollection
+		//				{
+		//					CustomerId = customerId,
+		//					LoanNoId = loanId,
+		//					LoanAmount = loanAmount,
+		//					LoanDuration = vMDaily.LoanDuration ?? 0,
+		//					PerDayInstallment = vMDaily.PerDayInstallment ?? 0,
+		//					TotalPaid = cumulativeTotalPaid,
+		//					PendingAmount = pending,
+		//					DaysPaid = daysPaid,
+		//					RemainingDays = remainingDays,
+		//					TodaysDate = incomingDate,
+		//					AmountPaidToday = newAmount,
+		//					IsActive = true,
+		//					CreatedBy = HttpContext.Current.Session["UserName"] as string,
+		//					CreatedDate = DateTime.Now
+		//				};
+
+		//				db.tblDailyCollections.Add(dailyCollection);
+		//				db.SaveChanges();
+		//				transaction.Commit();
+		//				return "Daily Collections Added Successfully";
+		//			}
+
+		//			// ---------------------- UPDATE -----------------------
+		//			existing.CustomerId = customerId;
+		//			existing.LoanNoId = loanId;
+		//			existing.LoanAmount = loanAmount;
+		//			existing.LoanDuration = vMDaily.LoanDuration ?? 0;
+		//			existing.PerDayInstallment = vMDaily.PerDayInstallment ?? 0;
+		//			existing.AmountPaidToday = newAmount;
+		//			existing.TotalPaid = cumulativeTotalPaid;
+		//			existing.PendingAmount = pending;
+		//			existing.DaysPaid = daysPaid;
+		//			existing.RemainingDays = remainingDays;
+		//			existing.TodaysDate = incomingDate;
+		//			existing.IsActive = true;
+		//			existing.ModifiedBy = HttpContext.Current.Session["UserName"] as string;
+		//			existing.ModifiedDate = DateTime.Now;
+
+		//			db.Entry(existing).State = System.Data.Entity.EntityState.Modified;
+		//			db.SaveChanges();
+
+		//			transaction.Commit();
+		//			return "Daily Collections Updated Successfully";
+		//		}
+		//		catch (Exception ex)
+		//		{
+		//			transaction.Rollback();
+		//			var errorMessage = ex.InnerException?.InnerException?.Message ?? ex.Message;
+		//			return "Error: " + errorMessage;
+		//		}
+		//	}
+		//}
+
+
 		public string AddDailyEntry(VMDailyCollection vMDaily)
 		{
 			using (var transaction = db.Database.BeginTransaction())
@@ -217,62 +339,57 @@ namespace ERP_Funds.DAL
 					int customerId = vMDaily.CustomerId ?? 0;
 					decimal newAmount = vMDaily.AmountPaidToday ?? 0;
 
-					// Find existing record (edit) or null (insert)
-					tblDailyCollection existing = db.tblDailyCollections
-						.FirstOrDefault(x => x.DailyCollectionId == vMDaily.DailyCollectionId);
+					// Find existing record
+					var existing = db.tblDailyCollections
+									 .FirstOrDefault(x => x.DailyCollectionId == vMDaily.DailyCollectionId);
 
-					// Get all active rows of this loan
+					// Fetch all old entries of this loan
 					var existingRows = db.tblDailyCollections
-										 .Where(d => d.IsActive == true && d.LoanNoId == loanId)
+										 .Where(x => x.IsActive == true && x.LoanNoId == loanId)
 										 .ToList();
 
-					// SUM excluding current record (if update)
-					decimal sumExcludingThis;
-					if (existing != null)
-					{
-						sumExcludingThis = existingRows
-							.Where(x => x.DailyCollectionId != existing.DailyCollectionId)
-							.Sum(x => x.AmountPaidToday ?? 0);
-					}
-					else
-					{
-						sumExcludingThis = existingRows.Sum(x => x.AmountPaidToday ?? 0);
-					}
+					// Sum excluding the entry in case of update
+					decimal sumExcludingThis =
+						(existing != null)
+						? existingRows.Where(x => x.DailyCollectionId != existing.DailyCollectionId)
+									  .Sum(x => x.AmountPaidToday ?? 0)
+						: existingRows.Sum(x => x.AmountPaidToday ?? 0);
 
-					// TOTAL PAID INCLUDING NEW ENTRY
+					// Total paid including new entry
 					decimal cumulativeTotalPaid = sumExcludingThis + newAmount;
 
-					// Fetch loan
+					// Fetch loan info
 					var loan = db.tblLoans.FirstOrDefault(l => l.LoanId == loanId);
-
 					decimal loanAmount = loan?.LoanAmount ?? 0;
+
+					// Pending amount calculation
 					decimal pending = loanAmount - cumulativeTotalPaid;
 					if (pending < 0) pending = 0;
 
-					// Compute Distinct Days Paid
+					// Distinct Days Paid calculation
 					var distinctDates = existingRows
 						.Where(x => existing == null || x.DailyCollectionId != existing.DailyCollectionId)
 						.Select(x => x.TodaysDate.HasValue ? x.TodaysDate.Value.Date : (DateTime?)null)
 						.Where(d => d != null)
 						.Select(d => d.Value)
-						.Distinct()
 						.ToList();
 
-					// include new date
+					// Include new date
 					DateTime incomingDate = vMDaily.TodaysDate?.Date ?? DateTime.Now.Date;
 					if (!distinctDates.Contains(incomingDate))
 						distinctDates.Add(incomingDate);
 
 					int daysPaid = distinctDates.Count;
 
-					// Remaining Days calculation
-					int loanDuration = loan?.LoanDurationDays ?? 0;
-					int remainingDays = Math.Max(loanDuration - daysPaid, 0);
+					// Correct Remaining Days
+					int duration = loan?.LoanDurationDays ?? 0;
+					int remainingDays = Math.Max(duration - daysPaid, 0);
 
-					// ---------------------- INSERT -----------------------
+
+					// ---------------- NEW ENTRY -----------------
 					if (existing == null)
 					{
-						tblDailyCollection dailyCollection = new tblDailyCollection
+						var daily = new tblDailyCollection
 						{
 							CustomerId = customerId,
 							LoanNoId = loanId,
@@ -290,13 +407,13 @@ namespace ERP_Funds.DAL
 							CreatedDate = DateTime.Now
 						};
 
-						db.tblDailyCollections.Add(dailyCollection);
+						db.tblDailyCollections.Add(daily);
 						db.SaveChanges();
 						transaction.Commit();
 						return "Daily Collections Added Successfully";
 					}
 
-					// ---------------------- UPDATE -----------------------
+					// ---------------- UPDATE ENTRY -----------------
 					existing.CustomerId = customerId;
 					existing.LoanNoId = loanId;
 					existing.LoanAmount = loanAmount;
@@ -314,18 +431,20 @@ namespace ERP_Funds.DAL
 
 					db.Entry(existing).State = System.Data.Entity.EntityState.Modified;
 					db.SaveChanges();
-
 					transaction.Commit();
+
 					return "Daily Collections Updated Successfully";
 				}
 				catch (Exception ex)
 				{
 					transaction.Rollback();
-					var errorMessage = ex.InnerException?.InnerException?.Message ?? ex.Message;
-					return "Error: " + errorMessage;
+					return "Error: " + (ex.InnerException?.InnerException?.Message ?? ex.Message);
 				}
 			}
 		}
+
+
+
 
 
 
